@@ -1,11 +1,18 @@
 import streamlit as st
+from PIL import ImageColor
+
+import utils
 
 st.title("Ulam Spiral Generator")
 
 st.header("Ulam")
 
 WHITE = "#ffffff"
-st.color_picker("Compound", WHITE)
+composite_color = ImageColor.getcolor(st.color_picker("Composite", WHITE), "RGB")
 
 BLACK = "#000000"
-st.color_picker("Primes", BLACK)
+prime_color = ImageColor.getcolor(st.color_picker("Primes", BLACK), "RGB")
+
+SIZE = 1_00
+
+st.image(utils.SpiralImage(SIZE, utils.PrimeColorMap(composite_color=composite_color, prime_color=prime_color)).get_spiral_image())
