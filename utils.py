@@ -10,6 +10,7 @@ from PIL import Image
 MAX_SIZE = 10_000
 FILE_NAME = "is_prime_array.npy"
 
+
 class ColorMap(ABC):
     @abstractmethod
     def __call__(self, *args, **kwargs):
@@ -77,7 +78,6 @@ class SpiralImage:
         for n, index in enumerate(self.get_spiral_indices(), start=1):
             spiral[*index] = self.color_map(n)
         return Image.fromarray(spiral, mode="RGB")
-
 
 # with open(FILE_NAME, "wb") as f:
 #     np.save(f, PrimeColorMap.sieve_of_eratosthenes_from_zero_to(MAX_SIZE * MAX_SIZE))
