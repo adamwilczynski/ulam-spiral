@@ -3,7 +3,11 @@ from PIL import ImageColor
 
 import utils
 
-st.title("Ulam Spiral Generator")
+PAGE_TITLE = "Ulam Spiral Generator"
+
+st.set_page_config(page_title=PAGE_TITLE, layout="wide")
+
+st.title(PAGE_TITLE)
 
 st.header("Ulam")
 
@@ -13,6 +17,12 @@ composite_color = ImageColor.getcolor(st.color_picker("Composite", WHITE), "RGB"
 BLACK = "#000000"
 prime_color = ImageColor.getcolor(st.color_picker("Primes", BLACK), "RGB")
 
-SIZE = 1_00
+size = st.slider("Specify square size", min_value=0, max_value=utils.MAX_SIZE)
 
-st.image(utils.SpiralImage(SIZE, utils.PrimeColorMap(composite_color=composite_color, prime_color=prime_color)).get_spiral_image())
+st.image(
+    utils.SpiralImage(
+        size,
+        composite_color=composite_color,
+        prime_color=prime_color
+        ).get_spiral_image()
+)

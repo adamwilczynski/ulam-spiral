@@ -1,55 +1,34 @@
-from abc import ABC, abstractmethod
-import itertools
 import itertools
 
-import PIL.Image
 import numpy as np
-
 from PIL import Image
 
-MAX_SIZE = 10_000
-FILE_NAME = "is_prime_array.npy"
+
+def sieve_of_eratosthenes_from_zero_to(n: int):
+    sieve = np.ones(n + 1, dtype=bool)
+    sieve[0], sieve[1] = False, False
+    for i, is_prime in enumerate(sieve):
+        if is_prime:
+            for j in range(i + i, sieve.size, i):
+                sieve[j] = False
+    return sieve
 
 
-class ColorMap(ABC):
-    @abstractmethod
-    def __call__(self, *args, **kwargs):
-        pass
+MAX_SIZE = 1_000
 
-
-class PrimeColorMap(ColorMap):
-    @staticmethod
-    def sieve_of_eratosthenes_from_zero_to(n: int):
-        sieve = np.ones(n + 1, dtype=bool)
-        sieve[0], sieve[1] = False, False
-        for i, is_prime in enumerate(sieve):
-            if is_prime:
-                for j in range(i + i, sieve.size, i):
-                    sieve[j] = False
-        return sieve
-
-    def __init__(self, composite_color, prime_color):
-        with open(FILE_NAME, "rb") as f:
-            self.prime_check = np.load(f)
-
-        self.composite_color = composite_color
-        self.prime_color = prime_color
-
-    def __call__(self, n: int):
-        if self.prime_check[n]:
-            return self.prime_color
-        return self.composite_color
+IS_PRIME_LIST = sieve_of_eratosthenes_from_zero_to(MAX_SIZE * MAX_SIZE)
 
 
 class SpiralImage:
-    def __init__(self, size: int, color_map: ColorMap):
+    def __init__(self, size: int, composite_color, prime_color):
+        if size % 2 == 0:
+            size += 1
         if size > MAX_SIZE:
             raise ValueError("Max size exceeded.")
-        if size % 2 == 0:
-            raise ValueError("Must be odd, so that 1 stays in the middle.")
-
         self.size = size
-        self.color_map = color_map
+
+        self.composite_color = composite_color
+        self.prime_color = prime_color
 
     def get_spiral_indices(self):
         right = np.array((0, 1))
@@ -76,8 +55,5 @@ class SpiralImage:
     def get_spiral_image(self):
         spiral = np.zeros((self.size, self.size, 3), dtype=np.uint8)
         for n, index in enumerate(self.get_spiral_indices(), start=1):
-            spiral[*index] = self.color_map(n)
+            spiral[*index] = self.prime_color if IS_PRIME_LIST[n] else self.composite_color
         return Image.fromarray(spiral, mode="RGB")
-
-# with open(FILE_NAME, "wb") as f:
-#     np.save(f, PrimeColorMap.sieve_of_eratosthenes_from_zero_to(MAX_SIZE * MAX_SIZE))
